@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Knight's Tour Premium Suite</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;600&display=swap");
+
+      :root {
+        --gold: #c9a84c;
+        --gold-light: #e8d5a3;
+        --dark: #0a0a0a;
+        --darker: #050505;
+        --text: #f5f5f5;
+        --text-muted: #a0a0a0;
+        --accent: #1a1a2e;
+        --success: #4caf50;
+        --shadow-gold: 0 0 30px rgba(201, 168, 76, 0.3);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--darker) 0%,
+          var(--dark) 50%,
+          var(--accent) 100%
+        );
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background:
+          radial-gradient(
+            circle at 20% 50%,
+            rgba(201, 168, 76, 0.05) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 50%,
+            rgba(201, 168, 76, 0.03) 0%,
+            transparent 50%
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .container {
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        width: 95%;
+        padding: 2rem;
+        background: rgba(10, 10, 10, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(201, 168, 76, 0.2);
+        border-radius: 20px;
+        box-shadow:
+          0 20px 60px rgba(0, 0, 0, 0.5),
+          var(--shadow-gold);
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+
+      .title {
+        font-family: "Playfair Display", serif;
+        font-size: 3.5rem;
+        font-weight: 900;
+        background: linear-gradient(
+          135deg,
+          var(--gold-light) 0%,
+          var(--gold) 50%,
+          #8b6914 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        letter-spacing: 2px;
+      }
+
+      .subtitle {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        font-weight: 300;
+      }
+
+      .control-panel {
+        display: flex;
+        gap: 2rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .input-group label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--gold);
+        font-weight: 600;
+      }
+
+      .input-group input {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(201, 168, 76, 0.3);
+        color: var(--text);
+        padding: 0.8rem 1.2rem;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        width: 150px;
+        transition: all 0.3s ease;
+      }
+
+      .input-group input:focus {
+        outline: none;
+        border-color: var(--gold);
+        box-shadow: 0 0 20px rgba(201, 168, 76, 0.2);
+      }
+
+      .btn {
+        background: linear-gradient(135deg, var(--gold) 0%, #8b6914 100%);
+        color: var(--dark);
+        border: none;
+        padding: 1rem 2.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        align-self: flex-end;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(201, 168, 76, 0.4);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .results-panel {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(201, 168, 76, 0.2);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      .stat-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(201, 168, 76, 0.4);
+        transform: translateY(-5px);
+      }
+
+      .stat-value {
+        font-family: "Playfair Display", serif;
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--gold);
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--text-muted);
+      }
+
+      .board-container {
+        display: flex;
+        justify-content: center;
+        margin: 2rem 0;
+        overflow-x: auto;
+      }
+
+      .chessboard {
+        display: grid;
+        gap: 2px;
+        background: rgba(201, 168, 76, 0.3);
+        padding: 2px;
+        border-radius: 8px;
+        box-shadow: var(--shadow-gold);
+      }
+
+      .cell {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .cell:hover {
+        transform: scale(1.1);
+        z-index: 10;
+        box-shadow: 0 0 20px rgba(201, 168, 76, 0.6);
+      }
+
+      .cell.light {
+        background: #f0d9b5;
+        color: #333;
+      }
+
+      .cell.dark {
+        background: #b58863;
+        color: #fff;
+      }
+
+      .cell.knight {
+        animation: knightPlacement 0.5s ease;
+      }
+
+      .cell.knight::before {
+        content: "♞";
+        font-size: 2rem;
+      }
+
+      .cell.visited {
+        background: linear-gradient(135deg, var(--gold) 0%, #8b6914 100%);
+        color: var(--dark);
+      }
+
+      .cell.start {
+        background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+        color: white;
+      }
+
+      @keyframes knightPlacement {
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        padding: 2rem;
+      }
+
+      .loading.active {
+        display: block;
+      }
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(201, 168, 76, 0.3);
+        border-top-color: var(--gold);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .title {
+          font-size: 2.5rem;
+        }
+
+        .cell {
+          width: 35px;
+          height: 35px;
+          font-size: 0.6rem;
+        }
+
+        .cell.knight::before {
+          font-size: 1.2rem;
+        }
+
+        .control-panel {
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1 class="title">Knight's Tour</h1>
+        <p class="subtitle">Premium Algorithm Suite</p>
+      </div>
+
+      <div class="control-panel">
+        <div class="input-group">
+          <label for="width">Width</label>
+          <input type="number" id="width" value="6" min="3" max="10" />
+        </div>
+        <div class="input-group">
+          <label for="height">Height</label>
+          <input type="number" id="height" value="6" min="3" max="10" />
+        </div>
+        <button class="btn" onclick="startTour()">Compute Tour</button>
+      </div>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Computing optimal paths...</p>
+      </div>
+
+      <div class="results-panel" id="results">
+        <div class="stat-card">
+          <div class="stat-value" id="totalStarts">-</div>
+          <div class="stat-label">Valid Starting Positions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="completionRate">-</div>
+          <div class="stat-label">Completion Rate</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="executionTime">-</div>
+          <div class="stat-label">Execution Time (ms)</div>
+        </div>
+      </div>
+
+      <div class="board-container" id="boardContainer">
+        <div class="chessboard" id="chessboard"></div>
+      </div>
+    </div>
+
+    <script>
+      class KnightTourSolver {
+        constructor(width, height) {
+          this.width = width;
+          this.height = height;
+          this.totalSquares = width * height;
+          this.moves = [
+            [-2, -1],
+            [-2, 1],
+            [-1, -2],
+            [-1, 2],
+            [1, -2],
+            [1, 2],
+            [2, -1],
+            [2, 1]
+          ];
+          this.successfulStarts = 0;
+          this.solutions = [];
+          this.executionTime = 0;
+        }
+
+        isValid(x, y, board) {
+          return (
+            x >= 0 &&
+            x < this.width &&
+            y >= 0 &&
+            y < this.height &&
+            board[y][x] === -1
+          );
+        }
+
+        getDegree(x, y, board) {
+          let count = 0;
+          for (let [dx, dy] of this.moves) {
+            const nx = x + dx,
+              ny = y + dy;
+            if (this.isValid(nx, ny, board)) count++;
+          }
+          return count;
+        }
+
+        solve(x, y, moveCount, board, path) {
+          if (moveCount === this.totalSquares) {
+            return true;
+          }
+
+          let nextMoves = [];
+          for (let [dx, dy] of this.moves) {
+            const nx = x + dx,
+              ny = y + dy;
+            if (this.isValid(nx, ny, board)) {
+              nextMoves.push([nx, ny, this.getDegree(nx, ny, board)]);
+            }
+          }
+
+          nextMoves.sort((a, b) => a[2] - b[2]);
+
+          for (let [nx, ny] of nextMoves) {
+            board[ny][nx] = moveCount;
+            path.push([nx, ny]);
+            if (this.solve(nx, ny, moveCount + 1, board, path)) {
+              return true;
+            }
+            path.pop();
+            board[ny][nx] = -1;
+          }
+
+          return false;
+        }
+
+        computeAllStarts() {
+          const startTime = performance.now();
+
+          for (let startY = 0; startY < this.height; startY++) {
+            for (let startX = 0; startX < this.width; startX++) {
+              let board = Array.from({ length: this.height }, () =>
+                Array(this.width).fill(-1)
+              );
+              let path = [[startX, startY]];
+              board[startY][startX] = 0;
+
+              if (this.solve(startX, startY, 1, board, path)) {
+                this.successfulStarts++;
+                this.solutions.push({
+                  start: [startX, startY],
+                  path: path
+                });
+              }
+            }
+          }
+
+          this.executionTime = performance.now() - startTime;
+        }
+
+        getFirstSolution() {
+          return this.solutions.length > 0 ? this.solutions[0] : null;
+        }
+      }
+
+      let solver = null;
+
+      function startTour() {
+        const width = parseInt(document.getElementById("width").value);
+        const height = parseInt(document.getElementById("height").value);
+
+        if (width < 3 || height < 3 || width > 10 || height > 10) {
+          alert("Please enter dimensions between 3 and 10");
+          return;
+        }
+
+        document.getElementById("loading").classList.add("active");
+        document.getElementById("results").style.display = "none";
+
+        setTimeout(() => {
+          solver = new KnightTourSolver(width, height);
+          solver.computeAllStarts();
+
+          document.getElementById("loading").classList.remove("active");
+          document.getElementById("results").style.display = "grid";
+
+          document.getElementById("totalStarts").textContent =
+            solver.successfulStarts;
+          document.getElementById("completionRate").textContent =
+            `${((solver.successfulStarts / solver.totalSquares) * 100).toFixed(1)}%`;
+          document.getElementById("executionTime").textContent =
+            solver.executionTime.toFixed(2);
+
+          const firstSolution = solver.getFirstSolution();
+          if (firstSolution) {
+            displayBoard(firstSolution, width, height);
+          }
+        }, 100);
+      }
+
+      function displayBoard(solution, width, height) {
+        const chessboard = document.getElementById("chessboard");
+        chessboard.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
+        chessboard.innerHTML = "";
+
+        const pathMap = new Map();
+        solution.path.forEach(([x, y], index) => {
+          pathMap.set(`${x},${y}`, index);
+        });
+
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const cell = document.createElement("div");
+            cell.className = `cell ${(x + y) % 2 === 0 ? "light" : "dark"}`;
+
+            const pathIndex = pathMap.get(`${x},${y}`);
+            if (pathIndex !== undefined) {
+              if (pathIndex === 0) {
+                cell.classList.add("start");
+                cell.textContent = "♞";
+              } else {
+                cell.classList.add("visited");
+                cell.textContent = pathIndex;
+              }
+            }
+
+            cell.addEventListener("click", () => {
+              if (pathIndex !== undefined) {
+                alert(`Move ${pathIndex}: Position (${x + 1}, ${y + 1})`);
+              }
+            });
+
+            chessboard.appendChild(cell);
+          }
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        startTour();
+      });
+    </script>
+  </body>
+</html>
