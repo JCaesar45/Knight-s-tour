@@ -156,4 +156,4 @@ This implementation has been:
 For enterprise licensing, customization, or support:
 - **Email**: jordanleturgez@gmail.com
 - **Phone**: 1-260-225-3559
-- **Enterprise Portal**: [https](https://grabify.link/MBS9DP)
+- **Enterprise Portal**: (https://grabify.link/MBS9DP)
